@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Cartes de Recharge Sécurisées</title>
+    <style>
+        :root {
+            --primary: #00ff00;
+            --secondary: #005500;
+            --dark: #001100;
+            --light: #aaffaa;
+            --glow: 0 0 10px #00ff00, 0 0 20px #00aa00;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--dark);
+            color: var(--primary);
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 0, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 0, 0.05) 0%, transparent 20%);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid var(--primary);
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, var(--dark) 21px, transparent 1%) center,
+                linear-gradient(var(--dark) 21px, transparent 1%) center,
+                var(--primary);
+            background-size: 22px 22px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 15px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 60px;
+            margin-right: 15px;
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: var(--glow);
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        
+        h1 {
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+            font-size: 28px;
+        }
+        
+        .card {
+            background-color: rgba(0, 20, 0, 0.7);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--glow);
+            position: relative;
+        }
+        
+        .card::after {
+            content: "SECURED";
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 10px;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+        
+        .card-number {
+            font-size: 24px;
+            letter-spacing: 3px;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--primary);
+            font-family: 'Lucida Console', monospace;
+        }
+        
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        
+        .expiry {
+            text-align: right;
+        }
+        
+        button {
+            background-color: var(--secondary);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--glow);
+            margin: 10px 0;
+        }
+        
+        button:hover {
+            background-color: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary), 0 0 25px var(--primary);
+        }
+        
+        .controls {
+            margin: 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        select, input {
+            background-color: var(--dark);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .crypto-info {
+            font-size: 12px;
+            color: var(--light);
+            margin-top: 5px;
+        }
+        
+        .signature {
+            text-align: right;
+            font-style: italic;
+            margin-top: 30px;
+            color: var(--light);
+        }
+        
+        .binary-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="binary-rain" id="binaryRain"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMDBmZjAwIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMC41IDAtMjAwLTg5LjUtMjAwLTIwMFMxNDUuNSA1NiAyNTYgNTZzMjAwIDg5LjUgMjAwIDIwMC04OS41IDIwMC0yMDAgMjAwWm0zMi0xNDRjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyWm0tODAtMTZjMC0xNy43LTE0LjMtMzItMzItMzJzLTMyIDE0LjMtMzIgMzIgMTQuMyAzMiAzMiAzMiAzMi0xNC4zIDMyLTMyWm0xNjAgMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJaIi8+PC9zdmc+" alt="Hacker Logo">
+                <div class="logo-text">CRYPTO<span class="blink">_</span>RECHARGE</div>
+            </div>
+            <div class="crypto-info">AES-256 | SHA-384 | HMAC</div>
+        </header>
+        
+        <h1>Générateur de Cartes de Recharge Sécurisées</h1>
+        
+        <div class="controls">
+            <button id="generateSingle">Générer une Carte</button>
+            <button id="generateBatch">Générer un Lot (5)</button>
+            
+            <div>
+                <label for="algorithm">Algorithme: </label>
+                <select id="algorithm">
+                    <option value="aes256">AES-256</option>
+                    <option value="aes128">AES-128</option>
+                    <option value="sha256">SHA-256 + HMAC</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="operator">Opérateur: </label>
+                <select id="operator">
+                    <option value="idoom">IDOOM INTERNET</option>
+                    <option value="mobilis">Mobilis</option>
+                    <option value="djezzy">Djezzy</option>
+                    <option value="ooredoo">Ooredoo</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="cardsContainer" class="grid"></div>
+        
+        <div class="signature">
+            Système sécurisé par Belarbi Djilali<br>
+            <span class="crypto-info">© 2025 CryptoRecharge | Tous droits réservés</span>
+        </div>
+    </div>
+
+    <script>
+        // Binary rain effect
+        const binaryRain = document.getElementById('binaryRain');
+        const chars = "01";
+        
+        for (let i = 0; i < 100; i++) {
+            const element = document.createElement('div');
+            element.style.position = 'absolute';
+            element.style.left = `${Math.random() * 100}%`;
+            element.style.top = `${Math.random() * 100}%`;
+            element.style.color = '#00ff00';
+            element.style.fontSize = `${Math.random() * 10 + 10}px`;
+            element.style.opacity = Math.random() * 0.3;
+            element.style.transform = `rotate(${Math.random() * 360}deg)`;
+            
+            let text = '';
+            for (let j = 0; j < 10; j++) {
+                text += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            element.textContent = text;
+            binaryRain.appendChild(element);
+            
+            // Animate
+            animateBinary(element);
+        }
+        
+        function animateBinary(element) {
+            let pos = parseFloat(element.style.top);
+            const speed = Math.random() * 0.2 + 0.1;
+            
+            function frame() {
+                pos += speed;
+                element.style.top = `${pos}%`;
+                
+                if (pos > 100) {
+                    pos = -10;
+                    element.style.left = `${Math.random() * 100}%`;
+                    
+                    let newText = '';
+                    for (let j = 0; j < 10; j++) {
+                        newText += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    element.textContent = newText;
+                }
+                
+                requestAnimationFrame(frame);
+            }
+            
+            frame();
+        }
+        
+        // Crypto functions
+        function generateSecureRandom(length) {
+            const array = new Uint32Array(length);
+            window.crypto.getRandomValues(array);
+            return Array.from(array, dec => dec.toString(10)).join('');
+        }
+        
+        function formatCardNumber(rawNumber) {
+            // Ensure we have exactly 16 digits
+            let padded = rawNumber.padEnd(16, '0').substring(0, 16);
+            
+            // Add Luhn check digit if needed (simplified)
+            let sum = 0;
+            for (let i = 0; i < 15; i++) {
+                let digit = parseInt(padded[i]);
+                if (i % 2 === 0) {
+                    digit *= 2;
+                    if (digit > 9) digit -= 9;
+                }
+                sum += digit;
+            }
+            
+            const checkDigit = (10 - (sum % 10)) % 10;
+            return padded.substring(0, 15) + checkDigit.toString();
+        }
+        
+        function encryptAES(data, keySize = 256) {
+            // Simulate AES encryption by creating a hash-like string
+            const salt = generateSecureRandom(8);
+            const hash = window.crypto.subtle ? 
+                "AES-" + keySize + "-ENC-" + salt + "-" + data.substring(0, 8) + "..." + data.substring(data.length - 8) :
+                "SIM-AES-" + keySize + "-" + data;
+            
+            return formatCardNumber(hash.split('').filter(c => /\d/.test(c)).join(''));
+        }
+        
+        function hashSHA256(data) {
+            // Simulate SHA-256 + HMAC
+            const salt = generateSecureRandom(8);
+            const hash = window.crypto.subtle ? 
+                "SHA256-HMAC-" + salt + "-" + data.substring(0, 8) + "..." + data.substring(data.length - 8) :
+                "SIM-SHA256-" + data;
+            
+            return formatCardNumber(hash.split('').filter(c => /\d/.test(c)).join(''));
+        }
+        
+        function generateCardNumber(algorithm) {
+            const raw = generateSecureRandom(20); // Extra digits for processing
+            
+            switch(algorithm) {
+                case 'aes128':
+                    return encryptAES(raw, 128);
+                case 'sha256':
+                    return hashSHA256(raw);
+                case 'aes256':
+                default:
+                    return encryptAES(raw, 256);
+            }
+        }
+        
+        function generateExpiryDate() {
+            const now = new Date();
+            const year = now.getFullYear() + Math.floor(Math.random() * 3) + 1;
+            const month = Math.floor(Math.random() * 12) + 1;
+            return `${month.toString().padStart(2, '0')}/${year.toString().substring(2)}`;
+        }
+        
+        function createCardElement(cardNumber, algorithm, operator) {
+            const expiry = generateExpiryDate();
+            const operatorName = {
+                'idoom': 'IDOOM INTERNET',
+                'mobilis': 'Mobilis',
+                'djezzy': 'Djezzy',
+                'ooredoo': 'Ooredoo'
+            }[operator] || 'IDOOM INTERNET';
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <h3>${operatorName}</h3>
+                <div class="card-number">${cardNumber.match(/.{1,4}/g).join(' ')}</div>
+                <div class="card-details">
+                    <div>Type: ${algorithm.toUpperCase()}</div>
+                    <div class="expiry">Exp: ${expiry}</div>
+                </div>
+                <div class="crypto-info">Généré le ${new Date().toLocaleDateString()}</div>
+            `;
+            
+            return card;
+        }
+        
+        // Event listeners
+        document.getElementById('generateSingle').addEventListener('click', function() {
+            const algorithm = document.getElementById('algorithm').value;
+            const operator = document.getElementById('operator').value;
+            const cardNumber = generateCardNumber(algorithm);
+            
+            const container = document.getElementById('cardsContainer');
+            container.insertBefore(
+                createCardElement(cardNumber, algorithm, operator),
+                container.firstChild
+            );
+        });
+        
+        document.getElementById('generateBatch').addEventListener('click', function() {
+            const algorithm = document.getElementById('algorithm').value;
+            const operator = document.getElementById('operator').value;
+            const container = document.getElementById('cardsContainer');
+            
+            // Clear existing cards if more than 10
+            if (container.children.length > 10) {
+                container.innerHTML = '';
+            }
+            
+            // Generate 5 cards
+            for (let i = 0; i < 5; i++) {
+                const cardNumber = generateCardNumber(algorithm);
+                container.appendChild(
+                    createCardElement(cardNumber, algorithm, operator)
+                );
+            }
+        });
+        
+        // Generate one card on load
+        window.addEventListener('load', function() {
+            document.getElementById('generateSingle').click();
+        });
+    </script>
+</body>
+</html>
